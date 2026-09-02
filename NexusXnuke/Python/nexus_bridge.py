@@ -128,7 +128,7 @@ def edit_in_nexus(node):
         _say(
             "NEXUS GS Viewer not found.\n\nSet the 'NEXUS app' knob to the "
             "executable, or install the viewer:\n"
-            "https://github.com/NXStorm/nex-gs-viewer/releases"
+            "https://github.com/NXStorm/nexus-gs-viewer/releases"
         )
         return
 

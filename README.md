@@ -4,7 +4,7 @@
 
 # Nexus x Nuke
 
-**Edit Gaussian Splats from inside Nuke — one click out to [NEXUS GS Viewer](https://github.com/NXStorm/nex-gs-viewer), one click back.**
+**Edit Gaussian Splats from inside Nuke — one click out to [NEXUS GS Viewer](https://github.com/NXStorm/nexus-gs-viewer), one click back.**
 
 ![Version](https://img.shields.io/badge/version-1.1.0-white)
 ![Nuke](https://img.shields.io/badge/Nuke-15%2B-f7df3a)
@@ -19,13 +19,17 @@
 
 ## What it does
 
-**Nexus x Nuke** bridges Nuke and [**NEXUS GS Viewer**](https://github.com/NXStorm/nex-gs-viewer), the open-source Gaussian Splatting viewer & editor. From a single node in your script:
+**Nexus x Nuke** bridges Nuke and [**NEXUS GS Viewer**](https://github.com/NXStorm/nexus-gs-viewer), the open-source Gaussian Splatting viewer & editor. From a single node in your script:
 
 1. **Edit in NEXUS** — opens your splat file (`.ply`, `.spz`, `.splat`, `.ksplat`) in the viewer
 2. Clean it up there — keep/erase shapes, eraser brush, splat selection, bake — then hit the viewer's **→ Nuke** button
 3. **Import result** — the edited splats land back in your script as a **GeoImport**, ready to view (select it, `V`, then `Tab` for 3D)
 
 Perfect companion to [Marble-x-Nuke](https://github.com/NXStorm/Marble-x-Nuke): generate a world with Marble, clean and previz it with NEXUS, composite in Nuke — without ever leaving your pipeline.
+
+<div align="center">
+<img src="docs/node-panel.png" alt="The NEXUS Edit node in Nuke" width="600" />
+</div>
 
 ## Why it matters
 
@@ -35,7 +39,7 @@ Splat scans and generated worlds arrive noisy — floaters, stray ground, blown 
 
 ### 1. Install NEXUS GS Viewer
 
-Grab it from the [releases page](https://github.com/NXStorm/nex-gs-viewer/releases) (Windows, macOS, Linux). Launch it once — on Windows it registers itself so the plugin finds it automatically.
+Grab it from the [releases page](https://github.com/NXStorm/nexus-gs-viewer/releases) (Windows, macOS, Linux). Launch it once — on Windows it registers itself so the plugin finds it automatically.
 
 ### 2. Copy the plugin
 
@@ -75,7 +79,7 @@ The **Edited output** path defaults to `<source>_nexus.ply`; the **NEXUS app** p
 ## Requirements
 
 - Nuke 15+ (Commercial, Indie or Non-Commercial) — tested on 15.2 and 17.0
-- [NEXUS GS Viewer](https://github.com/NXStorm/nex-gs-viewer/releases) **0.13 or newer** (the `--roundtrip` contract)
+- [NEXUS GS Viewer](https://github.com/NXStorm/nexus-gs-viewer/releases) **0.13 or newer** (the `--roundtrip` contract)
 - No external Python packages
 
 ## Troubleshooting
@@ -93,7 +97,7 @@ Released under the [MIT License](LICENSE). Free to use, modify, and ship in comm
 
 ## Credits
 
-- [NEXUS GS Viewer](https://github.com/NXStorm/nex-gs-viewer) — the editor this plugin talks to
+- [NEXUS GS Viewer](https://github.com/NXStorm/nexus-gs-viewer) — the editor this plugin talks to
 - Foundry — for Nuke, the compositing standard
 
 Built and maintained by **SINAI R&D** — [Patrick Crucke](https://www.linkedin.com/in/patrick-crucke/).

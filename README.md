@@ -6,7 +6,7 @@
 
 **Edit Gaussian Splats from inside Nuke — one click out to [NEXUS GS Viewer](https://github.com/NXStorm/nex-gs-viewer), one click back.**
 
-![Version](https://img.shields.io/badge/version-1.0.0-white)
+![Version](https://img.shields.io/badge/version-1.1.0-white)
 ![Nuke](https://img.shields.io/badge/Nuke-15%2B-f7df3a)
 ![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-0078d4)
 ![License](https://img.shields.io/badge/license-MIT-green)
@@ -65,6 +65,10 @@ That's it. A **NexusXnuke** menu appears in the Nodes toolbar.
 3. Click **Edit in NEXUS** → the viewer opens on your file
 4. Clean, animate, playblast… then click the viewer's **→ Nuke** button
 5. Back in Nuke, click **Import result** → a `NexusResult` GeoImport appears (select, `V`, `Tab`)
+
+**Camera round-trip** — **Import camera** creates an animated Nuke Camera from the shot you blocked in NEXUS (written next to the round-trip file when you click → Nuke with ≥2 keys); **Send camera** exports the selected Nuke Camera (ZXY) and replays it on the splats in the viewer.
+
+**Playblast** — renders the scene through the viewer's headless CLI (saved animation or auto-orbit, 1080p at your project fps) and drops the MP4 into a Read node when done.
 
 The **Edited output** path defaults to `<source>_nexus.ply`; the **NEXUS app** path is auto-detected (registry on Windows, `/Applications` on macOS) and remembered between sessions. You can also set the `NEXUS_GS_VIEWER` environment variable.
 

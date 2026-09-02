@@ -189,6 +189,211 @@ def import_result(node):
 
 
 # ---------------------------------------------------------------------------
+# Camera round-trip
+# ---------------------------------------------------------------------------
+def _chan_path(node):
+    out = node["gs_out"].value() or _default_output(node["gs_file"].value() or "scene.ply")
+    return os.path.splitext(out)[0] + ".chan"
+
+
+def import_camera(node):
+    """Create an animated Nuke Camera from the .chan the viewer exported.
+
+    The viewer writes it next to the round-trip file when you click its
+    '-> Nuke' button with at least 2 camera keys on the timeline.
+    """
+    chan = _chan_path(node)
+    if not os.path.exists(chan):
+        _say(
+            "No camera file yet (%s).\n\nIn NEXUS, set at least 2 camera keys "
+            "on the timeline, then click the '-> Nuke' button." % os.path.basename(chan)
+        )
+        return None
+
+    rows = []
+    with open(chan, "r") as f:
+        for line in f:
+            parts = line.split()
+            if len(parts) >= 7:
+                rows.append([float(v) for v in parts])
+    if len(rows) < 2:
+        _say("Camera file looks empty or invalid: %s" % chan)
+        return None
+
+    cam = None
+    for node_class in ("Camera4", "Camera3", "Camera2", "Camera"):
+        try:
+            cam = nuke.createNode(node_class, inpanel=False)
+            break
+        except RuntimeError:
+            continue
+    if cam is None:
+        _say("Could not create a Camera node in this Nuke version.")
+        return None
+
+    cam.setName("NexusCamera")
+    cam.setXYpos(node.xpos() - 120, node.ypos() + 60)
+    if "rot_order" in cam.knobs():
+        cam["rot_order"].setValue("ZXY")  # ordre d'écriture du .chan NEXUS
+
+    for knob_name in ("translate", "rotate"):
+        cam[knob_name].setAnimated()
+    has_focal = "focal" in cam.knobs()
+    if has_focal:
+        cam["focal"].setAnimated()
+
+    for row in rows:
+        frame = int(row[0])
+        for axis in range(3):
+            cam["translate"].setValueAt(row[1 + axis], frame, axis)
+            cam["rotate"].setValueAt(row[4 + axis], frame, axis)
+        if has_focal and len(row) >= 8:
+            cam["focal"].setValueAt(row[7], frame)
+
+    nuke.tprint("[NexusXnuke] Camera imported: %d frames from %s" % (len(rows), chan))
+    if nuke.GUI:
+        nuke.message(
+            "Camera imported into '%s' (%d frames, ZXY, focal for the default "
+            "18.672 vertical aperture)." % (cam.name(), len(rows))
+        )
+    return cam
+
+
+def send_camera(node):
+    """Export the selected Nuke Camera as .chan and replay it in the viewer."""
+    try:
+        cam = nuke.selectedNode()
+    except ValueError:
+        cam = None
+    if cam is None or not cam.Class().startswith("Camera"):
+        _say("Select a Camera node first.")
+        return
+
+    if "rot_order" in cam.knobs() and cam["rot_order"].value() != "ZXY":
+        _say(
+            "The camera's rotation order is '%s'. NEXUS expects ZXY — set the "
+            "Camera's rot order to ZXY (values unchanged for pan/tilt-only "
+            "moves) and try again." % cam["rot_order"].value()
+        )
+        return
+
+    src = node["gs_file"].evaluate() or node["gs_file"].value()
+    if not src or not os.path.exists(src):
+        _say("Set 'GS file' to an existing splat file first.")
+        return
+
+    root = nuke.root()
+    first = int(root["first_frame"].value())
+    last = int(root["last_frame"].value())
+    fps = int(root["fps"].value() or 25)
+
+    chan = os.path.splitext(src)[0] + "_nukecam.chan"
+    has_focal = "focal" in cam.knobs()
+    with open(chan, "w") as f:
+        for frame in range(first, last + 1):
+            values = [frame - first + 1]
+            for axis in range(3):
+                values.append(cam["translate"].getValueAt(frame, axis))
+            for axis in range(3):
+                values.append(cam["rotate"].getValueAt(frame, axis))
+            values.append(cam["focal"].getValueAt(frame) if has_focal else 50.0)
+            f.write(" ".join("%.6f" % v if i else str(int(v)) for i, v in enumerate(values)) + "\n")
+
+    exe = node["nexus_exe"].value() or find_nexus()
+    if not exe or not os.path.exists(exe):
+        _say("Camera written to %s, but NEXUS GS Viewer was not found." % chan)
+        return
+
+    out = node["gs_out"].value() or _default_output(src)
+    kwargs = {}
+    if platform.system() == "Windows":
+        kwargs["creationflags"] = 0x00000008 | 0x00000200
+    else:
+        kwargs["start_new_session"] = True
+    subprocess.Popen(
+        [exe, src, "--roundtrip", out, "--chan", chan, "--fps", str(fps)], **kwargs
+    )
+    nuke.tprint(
+        "[NexusXnuke] Camera '%s' sent (%d frames @ %d fps) — replaying on %s in NEXUS."
+        % (cam.name(), last - first + 1, fps, os.path.basename(src))
+    )
+
+
+# ---------------------------------------------------------------------------
+# Headless playblast
+# ---------------------------------------------------------------------------
+def playblast(node):
+    """Render a playblast through the viewer's headless CLI and Read it back.
+
+    Uses the scene's saved animation (sidecar) if present, otherwise an
+    automatic orbit.
+    """
+    exe = node["nexus_exe"].value() or find_nexus()
+    src = node["gs_file"].evaluate() or node["gs_file"].value()
+    if not exe or not os.path.exists(exe):
+        _say("NEXUS GS Viewer not found — set the 'NEXUS app' knob.")
+        return
+    if not src or not os.path.exists(src):
+        _say("Set 'GS file' to an existing splat file first.")
+        return
+
+    out = os.path.splitext(src)[0] + "_playblast.mp4"
+    if os.path.exists(out):
+        os.remove(out)
+    fps = int(nuke.root()["fps"].value() or 30)
+
+    kwargs = {}
+    if platform.system() == "Windows":
+        kwargs["creationflags"] = 0x00000008 | 0x00000200
+    else:
+        kwargs["start_new_session"] = True
+    subprocess.Popen(
+        [exe, src, "--render", out, "--res", "1920x1080", "--fps", str(fps)], **kwargs
+    )
+    nuke.tprint("[NexusXnuke] Playblast rendering to %s ..." % out)
+
+    def _finish():
+        read = nuke.createNode("Read", inpanel=False)
+        read["file"].setValue(out.replace("\\", "/"))
+        read.setName("NexusPlayblast")
+        read.setXYpos(node.xpos() + 240, node.ypos() + 60)
+        nuke.tprint("[NexusXnuke] Playblast imported: %s" % out)
+
+    def _wait(timeout=600):
+        import time
+
+        size = -1
+        for _ in range(timeout):
+            time.sleep(1)
+            if os.path.exists(out):
+                new_size = os.path.getsize(out)
+                if new_size > 0 and new_size == size:
+                    return True  # taille stable = rendu terminé
+                size = new_size
+        return False
+
+    if nuke.GUI:
+        import threading
+
+        def _bg():
+            if _wait():
+                nuke.executeInMainThread(_finish)
+            else:
+                nuke.executeInMainThread(
+                    lambda: nuke.message("Playblast timed out — check the viewer log.")
+                )
+
+        threading.Thread(target=_bg, daemon=True).start()
+        _say("Playblast rendering in the background — a Read node will appear when done.")
+    else:
+        if _wait():
+            _finish()
+        else:
+            _say("Playblast timed out.")
+    return out
+
+
+# ---------------------------------------------------------------------------
 # Node creation
 # ---------------------------------------------------------------------------
 def create_node():
@@ -227,6 +432,28 @@ def create_node():
             "nexus_import",
             "  Import result  ",
             "import nexus_bridge; nexus_bridge.import_result(nuke.thisNode())",
+        )
+    )
+
+    cam_import = nuke.PyScript_Knob(
+        "nexus_cam_import",
+        "  Import camera  ",
+        "import nexus_bridge; nexus_bridge.import_camera(nuke.thisNode())",
+    )
+    cam_import.setFlag(nuke.STARTLINE)
+    node.addKnob(cam_import)
+    node.addKnob(
+        nuke.PyScript_Knob(
+            "nexus_cam_send",
+            "  Send camera  ",
+            "import nexus_bridge; nexus_bridge.send_camera(nuke.thisNode())",
+        )
+    )
+    node.addKnob(
+        nuke.PyScript_Knob(
+            "nexus_playblast",
+            "  Playblast  ",
+            "import nexus_bridge; nexus_bridge.playblast(nuke.thisNode())",
         )
     )
 

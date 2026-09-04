@@ -70,7 +70,7 @@ That's it. A **NexusXnuke** menu appears in the Nodes toolbar.
 4. Clean, animate, playblast… then click the viewer's **→ Nuke** button
 5. Back in Nuke, click **Import result** → a `NexusResult` GeoImport appears (select, `V`, `Tab`)
 
-**Camera round-trip** — **Import camera** creates an animated Nuke Camera from the shot you blocked in NEXUS (written next to the round-trip file when you click → Nuke with ≥2 keys); **Send camera** exports the selected Nuke Camera (ZXY) and replays it on the splats in the viewer.
+**Camera round-trip** — **Import camera** creates an animated Nuke Camera from the shot you blocked in NEXUS (written next to the round-trip file when you click → Nuke with ≥2 keys); **Send camera** exports the selected Nuke Camera (ZXY) and replays it on the splats in the viewer. The `.chan` focal is written for Nuke's default 24.576 mm horizontal aperture, so an unmodified Camera node matches the playblast frame-for-frame (verified in Nuke 17; requires NEXUS GS Viewer ≥ 0.13.2 or NEXUS 4D Viewer ≥ 0.4.0).
 
 **Playblast** — renders the scene through the viewer's headless CLI (saved animation or auto-orbit, 1080p at your project fps) and drops the MP4 into a Read node when done.
 

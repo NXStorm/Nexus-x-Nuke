@@ -254,7 +254,7 @@ def import_camera(node):
     if nuke.GUI:
         nuke.message(
             "Camera imported into '%s' (%d frames, ZXY, focal for the default "
-            "18.672 vertical aperture)." % (cam.name(), len(rows))
+            "24.576 mm horizontal aperture)." % (cam.name(), len(rows))
         )
     return cam
 

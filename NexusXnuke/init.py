@@ -1,4 +1,4 @@
-# Nexus x Nuke — plugin path registration.
+# NEXUS Splats for Nuke — plugin path registration.
 import nuke
 import os
 

@@ -1,12 +1,12 @@
 <div align="center">
 
-<img src="docs/logo.png" alt="Nexus x Nuke" width="96" />
+<img src="docs/logo.png" alt="NEXUS Splats for Nuke" width="96" />
 
-# Nexus x Nuke
+# NEXUS Splats for Nuke
 
 **Edit Gaussian Splats from inside Nuke — one click out to [NEXUS GS Viewer](https://github.com/NXStorm/nexus-gs-viewer), one click back.**
 
-![Version](https://img.shields.io/badge/version-1.1.0-white)
+![Version](https://img.shields.io/badge/version-1.2.0-white)
 ![Nuke](https://img.shields.io/badge/Nuke-15%2B-f7df3a)
 ![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-0078d4)
 ![License](https://img.shields.io/badge/license-MIT-green)
@@ -19,7 +19,9 @@
 
 ## What it does
 
-**Nexus x Nuke** bridges Nuke and [**NEXUS GS Viewer**](https://github.com/NXStorm/nexus-gs-viewer), the open-source Gaussian Splatting viewer & editor. From a single node in your script:
+*Formerly **Nexus x Nuke** (1.0 and 1.1). Same plugin, same `NexusXnuke/` folder in `.nuke`, so nothing changes for an existing install — the name now follows the family (NEXUS Passes for Nuke, NEXUS Splats for Unreal).*
+
+**NEXUS Splats for Nuke** bridges Nuke and [**NEXUS GS Viewer**](https://github.com/NXStorm/nexus-gs-viewer), the open-source Gaussian Splatting viewer & editor. From a single node in your script:
 
 1. **Edit in NEXUS** — opens your splat file (`.ply`, `.spz`, `.splat`, `.ksplat`) in the viewer
 2. Clean it up there — keep/erase shapes, eraser brush, splat selection, bake — then hit the viewer's **→ Nuke** button
@@ -60,11 +62,11 @@ import nuke, os
 nuke.pluginAddPath(os.path.join(os.path.expanduser("~/.nuke"), "NexusXnuke"))
 ```
 
-That's it. A **NexusXnuke** menu appears in the Nodes toolbar.
+That's it. A **NEXUS Splats** menu appears in the Nodes toolbar.
 
 ## Usage
 
-1. Create a **NEXUS Edit** node from the NexusXnuke menu
+1. Create a **NEXUS Edit** node from the NEXUS Splats menu
 2. Set **GS file** — or select your GeoImport/ReadGeo and click **Grab from selected**
 3. Click **Edit in NEXUS** → the viewer opens on your file
 4. Clean, animate, playblast… then click the viewer's **→ Nuke** button

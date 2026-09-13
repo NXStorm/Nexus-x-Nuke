@@ -1,4 +1,4 @@
-# Pitfalls — Nexus x Nuke
+# Pitfalls — NEXUS Splats for Nuke (formerly Nexus x Nuke)
 
 The non-obvious traps met while building and running the plugin, and what to do about them. One entry per trap:
 **symptom** → **cause** → **what to do**, with the file concerned. All paths are relative to the plugin folder

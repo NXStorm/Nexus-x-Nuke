@@ -1,4 +1,4 @@
-"""Nexus x Nuke — edit Gaussian Splats in NEXUS GS Viewer, straight from Nuke.
+"""NEXUS Splats for Nuke — edit Gaussian Splats in NEXUS GS Viewer, straight from Nuke.
 
 Workflow: pick a splat file (or grab it from the selected node), click
 "Edit in NEXUS" to open it in the viewer, clean/animate there, hit the
@@ -41,7 +41,7 @@ def _say(msg):
     if nuke.GUI:
         nuke.message(msg)
     else:
-        print("[NexusXnuke] " + msg)
+        print("[NEXUS Splats] " + msg)
 
 
 # ---------------------------------------------------------------------------
@@ -150,7 +150,7 @@ def edit_in_nexus(node):
         kwargs["start_new_session"] = True
     subprocess.Popen([exe, src, "--roundtrip", out], **kwargs)
     nuke.tprint(
-        "[NexusXnuke] Editing %s in NEXUS — click the viewer's '-> Nuke' button, "
+        "[NEXUS Splats] Editing %s in NEXUS — click the viewer's '-> Nuke' button, "
         "then 'Import result' here." % os.path.basename(src)
     )
 
@@ -179,7 +179,7 @@ def import_result(node):
     geo["file"].setValue(out.replace("\\", "/"))
     geo.setName("NexusResult")
     geo.setXYpos(node.xpos() + 120, node.ypos() + 60)
-    nuke.tprint("[NexusXnuke] Imported %s (%s)" % (out, geo.Class()))
+    nuke.tprint("[NEXUS Splats] Imported %s (%s)" % (out, geo.Class()))
     if nuke.GUI:
         nuke.message(
             "Imported into '%s'.\n\nSelect it, press V to view, then Tab to "
@@ -250,7 +250,7 @@ def import_camera(node):
         if has_focal and len(row) >= 8:
             cam["focal"].setValueAt(row[7], frame)
 
-    nuke.tprint("[NexusXnuke] Camera imported: %d frames from %s" % (len(rows), chan))
+    nuke.tprint("[NEXUS Splats] Camera imported: %d frames from %s" % (len(rows), chan))
     if nuke.GUI:
         nuke.message(
             "Camera imported into '%s' (%d frames, ZXY, focal for the default "
@@ -314,7 +314,7 @@ def send_camera(node):
         [exe, src, "--roundtrip", out, "--chan", chan, "--fps", str(fps)], **kwargs
     )
     nuke.tprint(
-        "[NexusXnuke] Camera '%s' sent (%d frames @ %d fps) — replaying on %s in NEXUS."
+        "[NEXUS Splats] Camera '%s' sent (%d frames @ %d fps) — replaying on %s in NEXUS."
         % (cam.name(), last - first + 1, fps, os.path.basename(src))
     )
 
@@ -350,14 +350,14 @@ def playblast(node):
     subprocess.Popen(
         [exe, src, "--render", out, "--res", "1920x1080", "--fps", str(fps)], **kwargs
     )
-    nuke.tprint("[NexusXnuke] Playblast rendering to %s ..." % out)
+    nuke.tprint("[NEXUS Splats] Playblast rendering to %s ..." % out)
 
     def _finish():
         read = nuke.createNode("Read", inpanel=False)
         read["file"].setValue(out.replace("\\", "/"))
         read.setName("NexusPlayblast")
         read.setXYpos(node.xpos() + 240, node.ypos() + 60)
-        nuke.tprint("[NexusXnuke] Playblast imported: %s" % out)
+        nuke.tprint("[NEXUS Splats] Playblast imported: %s" % out)
 
     def _wait(timeout=600):
         import time

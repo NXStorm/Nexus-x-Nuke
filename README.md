@@ -91,6 +91,8 @@ The **Edited output** path defaults to `<source>_nexus.ply`; the **NEXUS app** p
 | Edited splats lost their view-dependent shading | Expected: NEXUS cleanup rebuilds splats without SH>0 harmonics — fine for previz |
 | The viewer opens but without the → Nuke button | Update NEXUS GS Viewer to 0.13+ |
 
+More traps (plugin path levels, stale `__pycache__`, rotation order and aperture of the `.chan`, the detached viewer process) in [docs/PITFALLS.md](docs/PITFALLS.md).
+
 ## License
 
 Released under the [MIT License](LICENSE). Free to use, modify, and ship in commercial work.
